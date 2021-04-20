@@ -20,6 +20,6 @@ Emulator Program using C#
 2. Thread
 > 
 3. .ini
-> INI(Initialization) 파일 포맷은 설정 파일에 대한 de facto 표준
-> INI 파일은 단순 구조의 텍스트 파일
->  마이크로소프트 윈도우와 연결되어 있지만 다른 운영 체제에서도 사용가능. "INI 파일"이라는 이름은 ".INI"라는 파일 확장자를 가짐.
+> INI(Initialization) 파일 포맷은 설정 파일에 대한 de facto 표준  
+> INI 파일은 단순 구조의 텍스트 파일  
+>  마이크로소프트 윈도우와 연결되어 있지만 다른 운영 체제에서도 사용가능. "INI 파일"이라는 이름은 ".INI"라는 파일 확장자를 가짐.  
