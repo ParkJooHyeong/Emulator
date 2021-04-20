@@ -29,6 +29,7 @@ namespace Emulator
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStart = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,6 +41,9 @@ namespace Emulator
             this.configToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.sb_IP = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sb_Port = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sbStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label16 = new System.Windows.Forms.Label();
@@ -76,9 +80,7 @@ namespace Emulator
             this.tbEqLine = new System.Windows.Forms.TextBox();
             this.tbEqBatt = new System.Windows.Forms.TextBox();
             this.tbMonitor = new System.Windows.Forms.TextBox();
-            this.sb_IP = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sb_Port = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sbStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.timerInterval = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -99,8 +101,9 @@ namespace Emulator
             this.configToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.MinimumSize = new System.Drawing.Size(630, 24);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(613, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(630, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -169,11 +172,35 @@ namespace Emulator
             this.sb_IP,
             this.sb_Port,
             this.sbStatus});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 431);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 441);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(613, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(630, 22);
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // sb_IP
+            // 
+            this.sb_IP.AutoSize = false;
+            this.sb_IP.Name = "sb_IP";
+            this.sb_IP.Size = new System.Drawing.Size(100, 17);
+            this.sb_IP.Text = "127.0.0.1";
+            this.sb_IP.Click += new System.EventHandler(this.sb_IP_Click);
+            // 
+            // sb_Port
+            // 
+            this.sb_Port.AutoSize = false;
+            this.sb_Port.Name = "sb_Port";
+            this.sb_Port.Size = new System.Drawing.Size(50, 17);
+            this.sb_Port.Text = "8080";
+            this.sb_Port.Click += new System.EventHandler(this.sb_Port_Click);
+            // 
+            // sbStatus
+            // 
+            this.sbStatus.AutoSize = false;
+            this.sbStatus.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.sbStatus.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.sbStatus.Name = "sbStatus";
+            this.sbStatus.Size = new System.Drawing.Size(121, 17);
             // 
             // splitContainer1
             // 
@@ -190,8 +217,8 @@ namespace Emulator
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tbMonitor);
-            this.splitContainer1.Size = new System.Drawing.Size(613, 407);
-            this.splitContainer1.SplitterDistance = 303;
+            this.splitContainer1.Size = new System.Drawing.Size(630, 417);
+            this.splitContainer1.SplitterDistance = 310;
             this.splitContainer1.TabIndex = 2;
             // 
             // groupBox3
@@ -205,7 +232,7 @@ namespace Emulator
             this.groupBox3.Controls.Add(this.dtStart);
             this.groupBox3.Location = new System.Drawing.Point(12, 287);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(288, 105);
+            this.groupBox3.Size = new System.Drawing.Size(295, 105);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "실행 정보";
@@ -234,6 +261,7 @@ namespace Emulator
             this.tbInterval.Name = "tbInterval";
             this.tbInterval.Size = new System.Drawing.Size(73, 21);
             this.tbInterval.TabIndex = 17;
+            this.tbInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label14
             // 
@@ -283,7 +311,7 @@ namespace Emulator
             this.groupBox2.Controls.Add(this.tbEqOz);
             this.groupBox2.Location = new System.Drawing.Point(12, 156);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(288, 115);
+            this.groupBox2.Size = new System.Drawing.Size(295, 115);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "환경 정보";
@@ -345,44 +373,56 @@ namespace Emulator
             // tbEqCelsius
             // 
             this.tbEqCelsius.Location = new System.Drawing.Point(76, 20);
+            this.tbEqCelsius.MaxLength = 4;
             this.tbEqCelsius.Name = "tbEqCelsius";
             this.tbEqCelsius.Size = new System.Drawing.Size(59, 21);
             this.tbEqCelsius.TabIndex = 12;
+            this.tbEqCelsius.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqTotal
             // 
             this.tbEqTotal.Location = new System.Drawing.Point(141, 74);
+            this.tbEqTotal.MaxLength = 4;
             this.tbEqTotal.Name = "tbEqTotal";
             this.tbEqTotal.Size = new System.Drawing.Size(59, 21);
             this.tbEqTotal.TabIndex = 17;
+            this.tbEqTotal.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqHumi
             // 
             this.tbEqHumi.Location = new System.Drawing.Point(141, 20);
+            this.tbEqHumi.MaxLength = 4;
             this.tbEqHumi.Name = "tbEqHumi";
             this.tbEqHumi.Size = new System.Drawing.Size(59, 21);
             this.tbEqHumi.TabIndex = 13;
+            this.tbEqHumi.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqAtmos
             // 
             this.tbEqAtmos.Location = new System.Drawing.Point(76, 74);
+            this.tbEqAtmos.MaxLength = 1;
             this.tbEqAtmos.Name = "tbEqAtmos";
             this.tbEqAtmos.Size = new System.Drawing.Size(59, 21);
             this.tbEqAtmos.TabIndex = 16;
+            this.tbEqAtmos.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqWind
             // 
             this.tbEqWind.Location = new System.Drawing.Point(76, 47);
+            this.tbEqWind.MaxLength = 4;
             this.tbEqWind.Name = "tbEqWind";
             this.tbEqWind.Size = new System.Drawing.Size(59, 21);
             this.tbEqWind.TabIndex = 14;
+            this.tbEqWind.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqOz
             // 
             this.tbEqOz.Location = new System.Drawing.Point(141, 47);
+            this.tbEqOz.MaxLength = 4;
             this.tbEqOz.Name = "tbEqOz";
             this.tbEqOz.Size = new System.Drawing.Size(59, 21);
             this.tbEqOz.TabIndex = 15;
+            this.tbEqOz.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // groupBox1
             // 
@@ -400,7 +440,7 @@ namespace Emulator
             this.groupBox1.Controls.Add(this.tbEqBatt);
             this.groupBox1.Location = new System.Drawing.Point(12, 18);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(288, 122);
+            this.groupBox1.Size = new System.Drawing.Size(295, 122);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "장비상태 정보";
@@ -462,44 +502,56 @@ namespace Emulator
             // tbEqcode
             // 
             this.tbEqcode.Location = new System.Drawing.Point(76, 29);
+            this.tbEqcode.MaxLength = 5;
             this.tbEqcode.Name = "tbEqcode";
             this.tbEqcode.Size = new System.Drawing.Size(59, 21);
             this.tbEqcode.TabIndex = 0;
+            this.tbEqcode.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqCount
             // 
             this.tbEqCount.Location = new System.Drawing.Point(141, 83);
+            this.tbEqCount.MaxLength = 5;
             this.tbEqCount.Name = "tbEqCount";
             this.tbEqCount.Size = new System.Drawing.Size(59, 21);
             this.tbEqCount.TabIndex = 5;
+            this.tbEqCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqModel
             // 
             this.tbEqModel.Location = new System.Drawing.Point(141, 29);
+            this.tbEqModel.MaxLength = 6;
             this.tbEqModel.Name = "tbEqModel";
             this.tbEqModel.Size = new System.Drawing.Size(59, 21);
             this.tbEqModel.TabIndex = 1;
+            this.tbEqModel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqState
             // 
             this.tbEqState.Location = new System.Drawing.Point(76, 83);
+            this.tbEqState.MaxLength = 1;
             this.tbEqState.Name = "tbEqState";
             this.tbEqState.Size = new System.Drawing.Size(59, 21);
             this.tbEqState.TabIndex = 4;
+            this.tbEqState.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqLine
             // 
             this.tbEqLine.Location = new System.Drawing.Point(76, 56);
+            this.tbEqLine.MaxLength = 5;
             this.tbEqLine.Name = "tbEqLine";
             this.tbEqLine.Size = new System.Drawing.Size(59, 21);
             this.tbEqLine.TabIndex = 2;
+            this.tbEqLine.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbEqBatt
             // 
             this.tbEqBatt.Location = new System.Drawing.Point(141, 56);
+            this.tbEqBatt.MaxLength = 5;
             this.tbEqBatt.Name = "tbEqBatt";
             this.tbEqBatt.Size = new System.Drawing.Size(59, 21);
             this.tbEqBatt.TabIndex = 3;
+            this.tbEqBatt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // tbMonitor
             // 
@@ -509,30 +561,16 @@ namespace Emulator
             this.tbMonitor.Size = new System.Drawing.Size(301, 404);
             this.tbMonitor.TabIndex = 0;
             // 
-            // sb_IP
+            // timerInterval
             // 
-            this.sb_IP.AutoSize = false;
-            this.sb_IP.Name = "sb_IP";
-            this.sb_IP.Size = new System.Drawing.Size(100, 17);
-            // 
-            // sb_Port
-            // 
-            this.sb_Port.AutoSize = false;
-            this.sb_Port.Name = "sb_Port";
-            this.sb_Port.Size = new System.Drawing.Size(50, 17);
-            // 
-            // sbStatus
-            // 
-            this.sbStatus.AutoSize = false;
-            this.sbStatus.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.sbStatus.Name = "sbStatus";
-            this.sbStatus.Size = new System.Drawing.Size(121, 17);
+            this.timerInterval.Interval = 10;
+            this.timerInterval.Tick += new System.EventHandler(this.timerInterval_Tick);
             // 
             // Virtual_Equipment
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(613, 453);
+            this.ClientSize = new System.Drawing.Size(630, 463);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
@@ -613,6 +651,7 @@ namespace Emulator
         private System.Windows.Forms.ToolStripStatusLabel sb_IP;
         private System.Windows.Forms.ToolStripStatusLabel sb_Port;
         private System.Windows.Forms.ToolStripStatusLabel sbStatus;
+        private System.Windows.Forms.Timer timerInterval;
     }
 }
 

@@ -9,7 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Clibrary;
+//using Clibrary;
+using jsLibrary;
 
 namespace Emulator
 {
@@ -20,6 +21,8 @@ namespace Emulator
             InitializeComponent();
         }
         iniFile ini;
+        Socket socket = null;
+        Thread readThread = null;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -42,7 +45,7 @@ namespace Emulator
             dtEnd.Value = new DateTime(long.Parse(ini.GetString("Operation", "End_Time", "0")));
             tbInterval.Text = ini.GetString("Operation", "Interval", "5");
 
-            sb_IP.Text = ini.GetString("Connection", "IP", "0.0.0.0");
+            sb_IP.Text = ini.GetString("Connection", "IP", "127.0.0.1");
             sb_Port.Text = ini.GetString("Connection", "Port", "8080");
             
             int x1, x2, y1, y2;
@@ -52,39 +55,38 @@ namespace Emulator
             x2 = int.Parse(ini.GetString("Form", "SizeX", "500"));
             y2 = int.Parse(ini.GetString("Form", "SizeY", "500"));
             this.Size = new Size(x2, y2);
-        }
 
+        }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            ini.WriteString("Equipment", "Code", tbEqcode.Text);        //장비 코드 5
-            ini.WriteString("Equipment", "Model", tbEqModel.Text);     //장비 모델 6
-            ini.WriteString("Equipment", "Line", tbEqLine.Text);        //라인 번호 5
-            ini.WriteString("Equipment", "Battery", tbEqBatt.Text);     //배터리 잔량 5
-            ini.WriteString("Equipment", "State", tbEqState.Text);           //현재 상태 1
-            ini.WriteString("Equipment", "Count", tbEqCount.Text);           //사용 횟수 5
+            if (readThread != null) readThread.Abort();
+            ini.SetString("Equipment", "Code", tbEqcode.Text);        //장비 코드 5
+            ini.SetString("Equipment", "Model", tbEqModel.Text);     //장비 모델 6
+            ini.SetString("Equipment", "Line", tbEqLine.Text);        //라인 번호 5
+            ini.SetString("Equipment", "Battery", tbEqBatt.Text);     //배터리 잔량 5
+            ini.SetString("Equipment", "State", tbEqState.Text);           //현재 상태 1
+            ini.SetString("Equipment", "Count", tbEqCount.Text);           //사용 횟수 5
 
-            ini.WriteString("Environment", "Temperature", tbEqCelsius.Text);   //온도 4
-            ini.WriteString("Environment", "Humidity", tbEqHumi.Text);         //습도 4
-            ini.WriteString("Environment", "Wind_Speed", tbEqWind.Text);       //풍속 4
-            ini.WriteString("Environment", "Atmosphere", tbEqAtmos.Text);      //대기 1
-            ini.WriteString("Environment", "Ozone", tbEqOz.Text);              //오존 4
-            ini.WriteString("Environment", "Total", tbEqTotal.Text);           //종합 4 : total 48bytes
+            ini.SetString("Environment", "Temperature", tbEqCelsius.Text);   //온도 4
+            ini.SetString("Environment", "Humidity", tbEqHumi.Text);         //습도 4
+            ini.SetString("Environment", "Wind_Speed", tbEqWind.Text);       //풍속 4
+            ini.SetString("Environment", "Atmosphere", tbEqAtmos.Text);      //대기 1
+            ini.SetString("Environment", "Ozone", tbEqOz.Text);              //오존 4
+            ini.SetString("Environment", "Total", tbEqTotal.Text);           //종합 4 : total 48bytes
 
-            ini.WriteString("Operation", "Start_Time", dtStart.Value.Ticks.ToString());
-            ini.WriteString("Operation", "End_Time", dtEnd.Value.Ticks.ToString());
-            ini.WriteString("Operation", "Interval", tbInterval.Text);
+            ini.SetString("Operation", "Start_Time", dtStart.Value.Ticks.ToString());
+            ini.SetString("Operation", "End_Time", dtEnd.Value.Ticks.ToString());
+            ini.SetString("Operation", "Interval", tbInterval.Text);
 
-            ini.WriteString("Connection", "IP", sb_IP.Text);
-            ini.WriteString("Connection", "Port", sb_Port.Text);
+            ini.SetString("Connection", "IP", sb_IP.Text);
+            ini.SetString("Connection", "Port", sb_Port.Text);
 
-            ini.WriteString("Form", "LocationX", this.Location.X.ToString());
-            ini.WriteString("Form", "LocationY", this.Location.Y.ToString());
-            ini.WriteString("Form", "SizeX", this.Size.Width.ToString());
-            ini.WriteString("Form", "SizeY", this.Size.Height.ToString());
+            ini.SetString("Form", "LocationX", this.Location.X.ToString());
+            ini.SetString("Form", "LocationY", this.Location.Y.ToString());
+            ini.SetString("Form", "SizeX", this.Size.Width.ToString());
+            ini.SetString("Form", "SizeY", this.Size.Height.ToString());
         }
 
-        Socket socket = null;
-        Thread readThread = null;
         private void menuStart_Click(object sender, EventArgs e)    // 서버와 처음 연결할 때.
         {
             try
@@ -99,6 +101,10 @@ namespace Emulator
                 if (readThread != null) readThread.Abort();   
                 readThread = new Thread(ReadProcess);   // Thread 생성.
                 readThread.Start();
+
+                timerInterval.Interval = int.Parse(tbInterval.Text) * 1000; // 주기적으로 인터럽트 생성
+                timerInterval.Start();
+                
             }
             catch (Exception)
             {
@@ -107,10 +113,89 @@ namespace Emulator
             }
 
         }
+        delegate void CallBack_AddText(string str);
+        
+        private void sb_IP_Click(object sender, EventArgs e)
+        {
+            string str = jslib.GetInput("IP Address");
+            if (str != "")
+            {
+                sb_IP.Text = str;
+            }
+        }
 
+        private void sb_Port_Click(object sender, EventArgs e)
+        {
+            string str = jslib.GetInput("Port");
+            if (str != "")
+            {
+                sb_Port.Text = str;
+            }
+        }
+        void AddText(string str)
+        {
+            if (tbMonitor.InvokeRequired)
+            {
+                CallBack_AddText cb = new CallBack_AddText(AddText);
+                Invoke(cb, new object[] { str });
+
+            }
+            else
+            {
+                tbMonitor.AppendText(str);
+            }
+
+        }
+        bool IsAlive(Socket sc) // Socket이 유효한지 판별.
+        {
+            if (sc == null) return false;
+            if (sc.Connected == false) return false;
+            if (sc.Poll(1000, SelectMode.SelectRead) && sc.Available > 0) return false;
+
+            try
+            {
+                sc.Send(new byte[1], 0, SocketFlags.OutOfBand); //제대로 연결되있는지 확인하기 위한 전송 메소드 실행.
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
+        }
         void ReadProcess()  //서버로 부터 값을 받아올 Thread
         {
+            Socket th_socket = socket;
+            while (true)
+            {
+                th_socket = socket;
+                if (IsAlive(th_socket)&&th_socket.Available>0)
+                {
+                    byte[] bArr = new byte[th_socket.Available];
+                    th_socket.Receive(bArr);
+                    string time = DateTime.Now.ToString("HH:mm:ss");
+                    AddText($"[{time}] : {Encoding.Default.GetString(bArr)} + \r\n");
+                }
+                Thread.Sleep(100);
+            }
+        }
 
+        private void timerInterval_Tick(object sender, EventArgs e)
+        {
+            timerInterval.Stop();
+
+            string str = tbEqcode.Text + tbEqModel.Text + tbEqLine.Text + tbEqBatt.Text + tbEqState.Text + tbEqCount.Text
+                + tbEqCelsius.Text + tbEqHumi.Text + tbEqWind.Text + tbEqOz.Text + tbEqAtmos.Text + tbEqTotal.Text;
+            byte[] bArr = Encoding.Default.GetBytes(str);
+            if (IsAlive(socket))
+            {
+                socket.Send(bArr);
+                tbEqCount.Text = (int.Parse(tbEqCount.Text)+1).ToString();
+            }
+            
+
+
+            timerInterval.Start();
         }
     }
 }
