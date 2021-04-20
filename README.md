@@ -1,5 +1,6 @@
 # Emulator
-Emulator Program using C#
+Emulator Program using C#  
+소켓을 활용한 서버, 클라이언트 통신 프로그램으로, 받아온 센서값을 서버로 전송하고 실시간으로 변화를 확인하는 기기의 에뮬레이터.
 
 ## Initial Screen   
 ![스크린샷 2021-04-20 오후 5 32 07](https://user-images.githubusercontent.com/67997760/115364425-58e37980-a1fe-11eb-92e1-c0d97976ea1c.png)
@@ -13,7 +14,12 @@ Emulator Program using C#
 - Port 클릭 : Port 번호 설정
 
 
-### methodology
+## methodology
 1. Socket
+> 
 2. Thread
+> 
 3. .ini
+> INI(Initialization) 파일 포맷은 설정 파일에 대한 de facto 표준
+> INI 파일은 단순 구조의 텍스트 파일
+>  마이크로소프트 윈도우와 연결되어 있지만 다른 운영 체제에서도 사용가능. "INI 파일"이라는 이름은 ".INI"라는 파일 확장자를 가짐.
