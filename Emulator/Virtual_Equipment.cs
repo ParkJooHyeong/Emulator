@@ -192,6 +192,9 @@ namespace Emulator
             timerInterval.Stop();
             if (CheckinTime())
             {
+                // 임의로 값을 생성해 실시간 변화 확인. --> 실제로는 센서 값이 될 것.
+                SetRandomValue();
+
                 // Generate Packet : front-->[02]STX, rear-->[03]ETX
                 string str = $"{STX}{tbEqcode.Text,5}{tbEqModel.Text,6}{tbEqLine.Text,5}{float.Parse(tbEqBatt.Text),5:F2}{tbEqState.Text,1}" +
                     $"{int.Parse(tbEqCount.Text):D5}{int.Parse(tbEqCelsius.Text):D4}{int.Parse(tbEqHumi.Text):D4}{int.Parse(tbEqWind.Text):D4}" +
@@ -205,6 +208,15 @@ namespace Emulator
                 }
             }
             timerInterval.Start();
+        }
+
+        void SetRandomValue()
+        {
+            Random rd = new Random();
+            tbEqCelsius.Text = $"{rd.Next(-50,50)}";
+            tbEqHumi.Text = $"{rd.Next(0,99)}";
+            tbEqWind.Text = $"{rd.Next(0,99)}";
+            tbEqOz.Text = $"{rd.Next(0,99)}";
         }
 
         bool CheckinTime()
