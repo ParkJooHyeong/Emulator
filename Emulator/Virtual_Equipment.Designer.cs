@@ -121,25 +121,26 @@ namespace Emulator
             // menuStart
             // 
             this.menuStart.Name = "menuStart";
-            this.menuStart.Size = new System.Drawing.Size(143, 22);
+            this.menuStart.Size = new System.Drawing.Size(180, 22);
             this.menuStart.Text = "Start";
             this.menuStart.Click += new System.EventHandler(this.menuStart_Click);
             // 
             // menuStop
             // 
             this.menuStop.Name = "menuStop";
-            this.menuStop.Size = new System.Drawing.Size(143, 22);
+            this.menuStop.Size = new System.Drawing.Size(180, 22);
             this.menuStop.Text = "Stop";
+            this.menuStop.Click += new System.EventHandler(this.menuStop_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(140, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
             // 
             // menuExitProgram
             // 
             this.menuExitProgram.Name = "menuExitProgram";
-            this.menuExitProgram.Size = new System.Drawing.Size(143, 22);
+            this.menuExitProgram.Size = new System.Drawing.Size(180, 22);
             this.menuExitProgram.Text = "Exit Program";
             // 
             // edditToolStripMenuItem
@@ -290,6 +291,7 @@ namespace Emulator
             // 
             // dtStart
             // 
+            this.dtStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
             this.dtStart.Location = new System.Drawing.Point(75, 20);
             this.dtStart.Name = "dtStart";
             this.dtStart.Size = new System.Drawing.Size(200, 21);

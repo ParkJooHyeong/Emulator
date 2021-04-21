@@ -179,23 +179,37 @@ namespace Emulator
                 Thread.Sleep(100);
             }
         }
-
+        char STX = '\u0002';    // Unicode
+        char ETX = '\u0003';    // Unicode
         private void timerInterval_Tick(object sender, EventArgs e)
         {
             timerInterval.Stop();
 
-            string str = tbEqcode.Text + tbEqModel.Text + tbEqLine.Text + tbEqBatt.Text + tbEqState.Text + tbEqCount.Text
-                + tbEqCelsius.Text + tbEqHumi.Text + tbEqWind.Text + tbEqOz.Text + tbEqAtmos.Text + tbEqTotal.Text;
+            //string str = STX+tbEqcode.Text + tbEqModel.Text + tbEqLine.Text + tbEqBatt.Text + tbEqState.Text + tbEqCount.Text
+            //    + tbEqCelsius.Text + tbEqHumi.Text + tbEqWind.Text + tbEqOz.Text + tbEqAtmos.Text + tbEqTotal.Text+ETX;
+
+            // Packet 생성, 보간 문자여열을 활용.
+            string str = $"{STX}{tbEqcode.Text,5}{tbEqModel.Text,6}{tbEqLine.Text,5}{float.Parse(tbEqBatt.Text),5:F2}{tbEqState.Text,1}" +
+                $"{int.Parse(tbEqCount.Text):D5}{int.Parse(tbEqCelsius.Text):D4}{int.Parse(tbEqHumi.Text):D4}{int.Parse(tbEqWind.Text):D4}" +
+                $"{int.Parse(tbEqOz.Text):D4}{int.Parse(tbEqAtmos.Text):D1}{int.Parse(tbEqTotal.Text):D4}{ETX}";
+
             byte[] bArr = Encoding.Default.GetBytes(str);
             if (IsAlive(socket))
             {
                 socket.Send(bArr);
                 tbEqCount.Text = (int.Parse(tbEqCount.Text)+1).ToString();
             }
+            // Generate Packet : front-->[02]STX, rear-->[03]ETX
             
-
-
             timerInterval.Start();
+        }
+
+        private void menuStop_Click(object sender, EventArgs e)
+        {
+            timerInterval.Stop();
+            if (readThread != null) { readThread.Abort(); readThread = null; }
+
+            if (socket != null) { socket.Close(); socket = null; } 
         }
     }
 }
