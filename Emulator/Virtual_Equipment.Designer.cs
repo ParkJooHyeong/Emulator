@@ -50,9 +50,9 @@ namespace Emulator
             this.label15 = new System.Windows.Forms.Label();
             this.tbInterval = new System.Windows.Forms.TextBox();
             this.label14 = new System.Windows.Forms.Label();
-            this.dtEnd = new System.Windows.Forms.DateTimePicker();
+            this.dtEnd_Days = new System.Windows.Forms.DateTimePicker();
             this.label7 = new System.Windows.Forms.Label();
-            this.dtStart = new System.Windows.Forms.DateTimePicker();
+            this.dtStart_Days = new System.Windows.Forms.DateTimePicker();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -81,6 +81,8 @@ namespace Emulator
             this.tbEqBatt = new System.Windows.Forms.TextBox();
             this.tbMonitor = new System.Windows.Forms.TextBox();
             this.timerInterval = new System.Windows.Forms.Timer(this.components);
+            this.dtStart_HMS = new System.Windows.Forms.DateTimePicker();
+            this.dtEnd_HMS = new System.Windows.Forms.DateTimePicker();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -224,13 +226,15 @@ namespace Emulator
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.dtEnd_HMS);
+            this.groupBox3.Controls.Add(this.dtStart_HMS);
             this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.label15);
             this.groupBox3.Controls.Add(this.tbInterval);
             this.groupBox3.Controls.Add(this.label14);
-            this.groupBox3.Controls.Add(this.dtEnd);
+            this.groupBox3.Controls.Add(this.dtEnd_Days);
             this.groupBox3.Controls.Add(this.label7);
-            this.groupBox3.Controls.Add(this.dtStart);
+            this.groupBox3.Controls.Add(this.dtStart_Days);
             this.groupBox3.Location = new System.Drawing.Point(12, 287);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(295, 105);
@@ -273,12 +277,13 @@ namespace Emulator
             this.label14.TabIndex = 9;
             this.label14.Text = "종료 시간";
             // 
-            // dtEnd
+            // dtEnd_Days
             // 
-            this.dtEnd.Location = new System.Drawing.Point(76, 47);
-            this.dtEnd.Name = "dtEnd";
-            this.dtEnd.Size = new System.Drawing.Size(200, 21);
-            this.dtEnd.TabIndex = 8;
+            this.dtEnd_Days.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtEnd_Days.Location = new System.Drawing.Point(76, 47);
+            this.dtEnd_Days.Name = "dtEnd_Days";
+            this.dtEnd_Days.Size = new System.Drawing.Size(99, 21);
+            this.dtEnd_Days.TabIndex = 8;
             // 
             // label7
             // 
@@ -289,13 +294,13 @@ namespace Emulator
             this.label7.TabIndex = 7;
             this.label7.Text = "시작 시간";
             // 
-            // dtStart
+            // dtStart_Days
             // 
-            this.dtStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.dtStart.Location = new System.Drawing.Point(75, 20);
-            this.dtStart.Name = "dtStart";
-            this.dtStart.Size = new System.Drawing.Size(200, 21);
-            this.dtStart.TabIndex = 0;
+            this.dtStart_Days.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtStart_Days.Location = new System.Drawing.Point(75, 20);
+            this.dtStart_Days.Name = "dtStart_Days";
+            this.dtStart_Days.Size = new System.Drawing.Size(100, 21);
+            this.dtStart_Days.TabIndex = 0;
             // 
             // groupBox2
             // 
@@ -568,6 +573,24 @@ namespace Emulator
             this.timerInterval.Interval = 10;
             this.timerInterval.Tick += new System.EventHandler(this.timerInterval_Tick);
             // 
+            // dtStart_HMS
+            // 
+            this.dtStart_HMS.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.dtStart_HMS.Location = new System.Drawing.Point(182, 20);
+            this.dtStart_HMS.Name = "dtStart_HMS";
+            this.dtStart_HMS.ShowUpDown = true;
+            this.dtStart_HMS.Size = new System.Drawing.Size(99, 21);
+            this.dtStart_HMS.TabIndex = 20;
+            // 
+            // dtEnd_HMS
+            // 
+            this.dtEnd_HMS.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.dtEnd_HMS.Location = new System.Drawing.Point(182, 47);
+            this.dtEnd_HMS.Name = "dtEnd_HMS";
+            this.dtEnd_HMS.ShowUpDown = true;
+            this.dtEnd_HMS.Size = new System.Drawing.Size(99, 21);
+            this.dtEnd_HMS.TabIndex = 21;
+            // 
             // Virtual_Equipment
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -620,9 +643,9 @@ namespace Emulator
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox tbInterval;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.DateTimePicker dtEnd;
+        private System.Windows.Forms.DateTimePicker dtEnd_Days;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.DateTimePicker dtStart;
+        private System.Windows.Forms.DateTimePicker dtStart_Days;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
@@ -654,6 +677,8 @@ namespace Emulator
         private System.Windows.Forms.ToolStripStatusLabel sb_Port;
         private System.Windows.Forms.ToolStripStatusLabel sbStatus;
         private System.Windows.Forms.Timer timerInterval;
+        private System.Windows.Forms.DateTimePicker dtStart_HMS;
+        private System.Windows.Forms.DateTimePicker dtEnd_HMS;
     }
 }
 

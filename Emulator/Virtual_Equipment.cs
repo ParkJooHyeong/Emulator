@@ -41,8 +41,11 @@ namespace Emulator
             tbEqOz.Text = ini.GetString("Environment", "Ozone", "0000");              //오존 4
             tbEqTotal.Text = ini.GetString("Environment", "Total", "0000");           //종합 4 : total 48bytes
 
-            dtStart.Value = new DateTime(long.Parse(ini.GetString("Operation", "Start_Time", "0")));
-            dtEnd.Value = new DateTime(long.Parse(ini.GetString("Operation", "End_Time", "0")));
+            dtStart_Days.Value = new DateTime(long.Parse(ini.GetString("Operation", "Start_Time_Days", "0")));
+            dtStart_HMS.Value = new DateTime(long.Parse(ini.GetString("Operation", "Start_Time_HMS", "0")));
+            dtEnd_Days.Value = new DateTime(long.Parse(ini.GetString("Operation", "End_Time_Days", "0")));
+            dtEnd_HMS.Value = new DateTime(long.Parse(ini.GetString("Operation", "End_Time_HMS", "0")));
+
             tbInterval.Text = ini.GetString("Operation", "Interval", "5");
 
             sb_IP.Text = ini.GetString("Connection", "IP", "127.0.0.1");
@@ -74,8 +77,11 @@ namespace Emulator
             ini.SetString("Environment", "Ozone", tbEqOz.Text);              //오존 4
             ini.SetString("Environment", "Total", tbEqTotal.Text);           //종합 4 : total 48bytes
 
-            ini.SetString("Operation", "Start_Time", dtStart.Value.Ticks.ToString());
-            ini.SetString("Operation", "End_Time", dtEnd.Value.Ticks.ToString());
+            ini.SetString("Operation", "Start_Time_Days", dtStart_Days.Value.Ticks.ToString());
+            ini.SetString("Operation", "Start_Time_HMS", dtStart_HMS.Value.Ticks.ToString());
+            ini.SetString("Operation", "End_Time_Days", dtEnd_Days.Value.Ticks.ToString());
+            ini.SetString("Operation", "End_Time_HMS", dtEnd_HMS.Value.Ticks.ToString());
+
             ini.SetString("Operation", "Interval", tbInterval.Text);
 
             ini.SetString("Connection", "IP", sb_IP.Text);
@@ -184,24 +190,44 @@ namespace Emulator
         private void timerInterval_Tick(object sender, EventArgs e)
         {
             timerInterval.Stop();
-
-            //string str = STX+tbEqcode.Text + tbEqModel.Text + tbEqLine.Text + tbEqBatt.Text + tbEqState.Text + tbEqCount.Text
-            //    + tbEqCelsius.Text + tbEqHumi.Text + tbEqWind.Text + tbEqOz.Text + tbEqAtmos.Text + tbEqTotal.Text+ETX;
-
-            // Packet 생성, 보간 문자여열을 활용.
-            string str = $"{STX}{tbEqcode.Text,5}{tbEqModel.Text,6}{tbEqLine.Text,5}{float.Parse(tbEqBatt.Text),5:F2}{tbEqState.Text,1}" +
-                $"{int.Parse(tbEqCount.Text):D5}{int.Parse(tbEqCelsius.Text):D4}{int.Parse(tbEqHumi.Text):D4}{int.Parse(tbEqWind.Text):D4}" +
-                $"{int.Parse(tbEqOz.Text):D4}{int.Parse(tbEqAtmos.Text):D1}{int.Parse(tbEqTotal.Text):D4}{ETX}";
-
-            byte[] bArr = Encoding.Default.GetBytes(str);
-            if (IsAlive(socket))
+            if (CheckinTime())
             {
-                socket.Send(bArr);
-                tbEqCount.Text = (int.Parse(tbEqCount.Text)+1).ToString();
+                // Generate Packet : front-->[02]STX, rear-->[03]ETX
+                string str = $"{STX}{tbEqcode.Text,5}{tbEqModel.Text,6}{tbEqLine.Text,5}{float.Parse(tbEqBatt.Text),5:F2}{tbEqState.Text,1}" +
+                    $"{int.Parse(tbEqCount.Text):D5}{int.Parse(tbEqCelsius.Text):D4}{int.Parse(tbEqHumi.Text):D4}{int.Parse(tbEqWind.Text):D4}" +
+                    $"{int.Parse(tbEqOz.Text):D4}{int.Parse(tbEqAtmos.Text):D1}{int.Parse(tbEqTotal.Text):D4}{ETX}";
+
+                byte[] bArr = Encoding.Default.GetBytes(str);
+                if (IsAlive(socket))
+                {
+                    socket.Send(bArr);
+                    tbEqCount.Text = (int.Parse(tbEqCount.Text)+1).ToString();
+                }
             }
-            // Generate Packet : front-->[02]STX, rear-->[03]ETX
-            
             timerInterval.Start();
+        }
+
+        bool CheckinTime()
+        {
+            DateTime dt = DateTime.Now;
+            DateTime start = dtStart_Days.Value.Date+dtStart_HMS.Value.TimeOfDay;
+            DateTime end = dtEnd_Days.Value.Date+dtEnd_HMS.Value.TimeOfDay;
+            //Console.WriteLine(dt.Ticks);
+            //Console.WriteLine(start.Ticks);
+            //Console.WriteLine(end.Ticks);
+
+            if (dt > start && dt < end)
+            {
+                sbStatus.Text = "Connection Success";
+                sbStatus.BackColor = Color.Blue;
+                return true;
+            } 
+            else 
+            {
+                sbStatus.Text = "Check Timer";
+                sbStatus.BackColor = Color.MediumVioletRed;
+                return false;
+            } 
         }
 
         private void menuStop_Click(object sender, EventArgs e)
@@ -209,7 +235,9 @@ namespace Emulator
             timerInterval.Stop();
             if (readThread != null) { readThread.Abort(); readThread = null; }
 
-            if (socket != null) { socket.Close(); socket = null; } 
+            if (socket != null) { socket.Close(); socket = null; }
+            sbStatus.Text = "Stop Connection";
+            sbStatus.BackColor = Color.Gray;
         }
     }
 }
