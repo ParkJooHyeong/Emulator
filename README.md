@@ -6,6 +6,12 @@ Emulator Program using C#
 ![스크린샷 2021-04-22 오후 5 35 29](https://user-images.githubusercontent.com/67997760/115683201-2ae26e80-a391-11eb-8da6-44a5bd023414.png)
 
 ## Manual  
+#### Virtual Equipment Manager(Left)
+- File > Start : Server 시작, TCP listener를 활용해 socket을 기다림.
+- File > End : Server 종료.
+- File > Exit Program : 프로그램 종료
+- EquipDB.mdf : 수신한 값을 저장해둔 Local Database 파일 
+#### Virtual Equipment(Right)
 - File > Start : Server와 연결 시도. 시간 간격 마다 데이터(기기 정보 및 센서 값) 전송.
 - File > End : Server와 연결 해제
 - File > Exit Program : 프로그램 종료
