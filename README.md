@@ -3,7 +3,7 @@ Emulator Program using C#
 소켓을 활용한 서버, 클라이언트 통신 프로그램으로, 받아온 센서값을 서버로 전송하고 실시간으로 변화를 확인하는 기기의 에뮬레이터.
 
 ## Initial Screen   
-![스크린샷 2021-04-20 오후 5 32 07](https://user-images.githubusercontent.com/67997760/115364425-58e37980-a1fe-11eb-92e1-c0d97976ea1c.png)
+![스크린샷 2021-04-22 오후 5 35 29](https://user-images.githubusercontent.com/67997760/115683201-2ae26e80-a391-11eb-8da6-44a5bd023414.png)
 
 ## Manual  
 - File > Start : Server와 연결 시도. 시간 간격 마다 데이터(기기 정보 및 센서 값) 전송.
