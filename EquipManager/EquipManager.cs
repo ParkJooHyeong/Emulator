@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
@@ -25,6 +26,11 @@ namespace EquipManager
         Thread serverThread = null;
         Thread readThread = null;
         List<Socket> sock_list = new List<Socket>();
+
+        string connectionStr = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\박주형\Desktop\KOSTA\Emulator\EquipDB.mdf;Integrated Security=True;Connect Timeout=30";
+        SqlConnection sqlconn = new SqlConnection();
+        SqlCommand sqlcomd = new SqlCommand();
+
         delegate void CallBackAddText(string str);
         void AddText(string str)
         {
@@ -35,7 +41,7 @@ namespace EquipManager
             }
             else
             {
-                tbMonitor.AppendText(str);
+                tbMonitor.Text+=str;
             }
         }
 
@@ -74,7 +80,7 @@ namespace EquipManager
                 for(int i = 0; i < sock_list.Count; i++)
                 {
                     Socket lsock = sock_list[i];
-                    if (IsAlive(lsock) == false) continue;
+                    //if (IsAlive(lsock) == false) continue;
                     if (lsock.Available > 0)
                     {
                         byte[] bArr = new byte[lsock.Available];
@@ -86,12 +92,39 @@ namespace EquipManager
             }
 
         }
+
+
         void ReadPro(Socket ss, byte[] arr)
         {
-            AddText(ss.RemoteEndPoint.ToString()+"> ");
-            AddText(Encoding.Default.GetString(arr)+"\r\n");
+            string str = Encoding.Default.GetString(arr);
+            string Code = str.Substring(1,5);
+            string Model = str.Substring(6,6);
+            string Line=str.Substring(12,5);
+            string Batt= str.Substring(17,5);
+            string State= str.Substring(22,1);
+            string Count= str.Substring(23,5);
+            string Temp= str.Substring(28, 4);
+            string Humi= str.Substring(32,4);
+            string Wind= str.Substring(36,4);
+            string Ozone= str.Substring(40,4);
+            string Atmos=str.Substring(44,1);
+            string Total= str.Substring(45,4);
+           // DateTime Time = DateTime.Now.To;
 
+            AddText(ss.RemoteEndPoint.ToString()+"> ");
+            jslib.WriteLog(str);
+            AddText(str+"\r\n");
+
+            string sql = $"insert into EqStatus values ({Code},'{Model}','{Line}','{Batt}','{State}','{Count}','{Temp}','{Humi}','{Wind}','{Ozone}','{Atmos}','{Total}',getdate())";
+            RunSql(sql);
         }
+
+        void RunSql(string sql)
+        {
+            sqlcomd.CommandText=sql;
+            sqlcomd.ExecuteNonQuery();      // insert, update, delete, create etc..조회결과가 없은 SQL문 처리
+        }
+
         bool IsAlive(Socket sc) // Socket이 유효한지 판별.
         {
             if (sc == null) return false;
@@ -123,8 +156,12 @@ namespace EquipManager
             x2 = int.Parse(ini.GetString("Form", "SizeX", "500"));
             y2 = int.Parse(ini.GetString("Form", "SizeY", "500"));
             this.Size = new Size(x2, y2);
+            connectionStr = ini.GetString("Database", "ConnectionString", @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\박주형\Desktop\KOSTA\Emulator\EquipDB.mdf;Integrated Security=True;Connect Timeout=30");
 
             tabControl1.SelectedIndex = int.Parse(ini.GetString("Form", "TabIndex", "1"));
+            sqlconn.ConnectionString = connectionStr;
+            sqlconn.Open();
+            sqlcomd.Connection = sqlconn;
         }
 
         private void EquipManager_FormClosing(object sender, FormClosingEventArgs e)
@@ -137,6 +174,8 @@ namespace EquipManager
             ini.SetString("Form", "SizeY", this.Size.Height.ToString());
 
             ini.SetString("Form", "TabIndex", $"{ tabControl1.SelectedIndex}");
+
+            ini.SetString("Database", "ConnectionString", connectionStr);
 
             if (serverThread != null) serverThread.Abort();
             if (readThread != null) readThread.Abort();
