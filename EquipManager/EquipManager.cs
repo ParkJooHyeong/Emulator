@@ -109,20 +109,74 @@ namespace EquipManager
             string Ozone= str.Substring(40,4);
             string Atmos=str.Substring(44,1);
             string Total= str.Substring(45,4);
-           // DateTime Time = DateTime.Now.To;
+            string Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             AddText(ss.RemoteEndPoint.ToString()+"> ");
             jslib.WriteLog(str);
             AddText(str+"\r\n");
 
-            string sql = $"insert into EqStatus values ({Code},'{Model}','{Line}','{Batt}','{State}','{Count}','{Temp}','{Humi}','{Wind}','{Ozone}','{Atmos}','{Total}',getdate())";
+            Console.WriteLine(Code);
+            string sql;
+            sql = $"select count(*) from EqStatus where Code={Code}";
+            DataTable dt = (DataTable)RunSql(sql);
+            int n= dt.Rows[0].Field<int>(0);
+            if (n == 0)
+            {
+                sql = $"insert into EqStatus values ({Code},'{Model}','{Line}','{Batt}','{State}','{Count}','{Temp}','{Humi}','{Wind}','{Ozone}','{Atmos}','{Total}','{Time}')";
+            }
+            else
+            {
+                sql = $"update EqStatus set Model='{Model}', Line = '{Line}',Battery = '{Batt}', State='{State}',Count='{Count}',Temp='{Temp}'," +
+                    $"Humi='{Humi}',Wind='{Wind}',Ozone='{Ozone}',Atmos='{Atmos}',Total='{Total}',Time='{Time}' where Code={Code} select top 1 * from EqStatus where Code='{Code}' order by Time desc ";
+            }
             RunSql(sql);
-        }
 
-        void RunSql(string sql)
+            // GridView 출력
+            SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM EqStatus", sqlconn);
+            DataTable ds = new DataTable();
+            adapter.Fill(ds);
+            GridView(ds);
+            
+            
+        }
+        delegate void CallBackGridView(DataTable dt);
+        void GridView(DataTable dt)
+        {
+            if (gridTable.InvokeRequired)
+            {
+                CallBackGridView cb = new CallBackGridView(GridView);
+                Invoke(cb, dt);
+            }
+            else
+            {
+                gridTable.DataSource = dt;
+                tModel.Text = dt.Rows[0][1].ToString();
+                tLine.Text = dt.Rows[0][2].ToString();
+                tBatt.Text = dt.Rows[0][3].ToString();
+                tState.Text = dt.Rows[0][4].ToString();
+                tCount.Text = dt.Rows[0][5].ToString();
+                tTemp.Text = dt.Rows[0][6].ToString();
+                tHumi.Text = dt.Rows[0][7].ToString();
+                tWind.Text = dt.Rows[0][8].ToString();
+                tOzone.Text = dt.Rows[0][9].ToString();
+                tAtmos.Text = dt.Rows[0][10].ToString();
+            }
+        }
+        object RunSql(string sql) // op= 0 -> return nothing, op=1 -> return object
         {
             sqlcomd.CommandText=sql;
-            sqlcomd.ExecuteNonQuery();      // insert, update, delete, create etc..조회결과가 없은 SQL문 처리
+            if (jslib.GetToken(0, sql.Trim(), ' ').ToUpper() == "SELECT")
+            {
+                SqlDataReader sr = sqlcomd.ExecuteReader();
+                DataTable dt = new DataTable();
+                dt.Load(sr);
+                sr.Close();
+                return dt;
+            }
+            else
+            {
+                return sqlcomd.ExecuteNonQuery();      // insert, update, delete, create etc..조회결과가 없은 SQL문 처리
+            }
         }
 
         bool IsAlive(Socket sc) // Socket이 유효한지 판별.
@@ -162,6 +216,19 @@ namespace EquipManager
             sqlconn.ConnectionString = connectionStr;
             sqlconn.Open();
             sqlcomd.Connection = sqlconn;
+            SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM EqStatus", sqlconn);
+            DataTable ds = new DataTable();
+            adapter.Fill(ds);
+            GridView(ds);
+            int cnum = ds.Rows.Count;
+            Control[] BTN = new Control[cnum];
+            for (int i = 0; i < cnum; i++)
+            {
+                BTN[i] = new Button();
+                BTN[i].Text = $"Code : {i+1}";
+                // BTM[i].Click+=Select_Code;
+                flpanel.Controls.Add(BTN[i]);
+            }
         }
 
         private void EquipManager_FormClosing(object sender, FormClosingEventArgs e)

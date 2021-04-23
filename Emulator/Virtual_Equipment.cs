@@ -213,7 +213,7 @@ namespace Emulator
         void SetRandomValue()
         {
             Random rd = new Random();
-            tbEqCelsius.Text = $"{rd.Next(-50,50)}";
+            tbEqCelsius.Text = $"{rd.Next(0,50)}";
             tbEqHumi.Text = $"{rd.Next(0,99)}";
             tbEqWind.Text = $"{rd.Next(0,99)}";
             tbEqOz.Text = $"{rd.Next(0,99)}";
