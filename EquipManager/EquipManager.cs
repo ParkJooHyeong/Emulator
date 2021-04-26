@@ -30,8 +30,10 @@ namespace EquipManager
         string connectionStr = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\박주형\Desktop\KOSTA\Emulator\EquipDB.mdf;Integrated Security=True;Connect Timeout=30";
         SqlConnection sqlconn = new SqlConnection();
         SqlCommand sqlcomd = new SqlCommand();
-
+        SQLDB sqlDB = null;
         delegate void CallBackAddText(string str);
+
+        int index = 0;
         void AddText(string str)
         {
             if (tbMonitor.InvokeRequired)
@@ -135,12 +137,12 @@ namespace EquipManager
             SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM EqStatus", sqlconn);
             DataTable ds = new DataTable();
             adapter.Fill(ds);
-            GridView(ds);
+            GridView(ds, index);
             
             
         }
-        delegate void CallBackGridView(DataTable dt);
-        void GridView(DataTable dt)
+        delegate void CallBackGridView(DataTable dt, int idx);
+        void GridView(DataTable dt,int idx)
         {
             if (gridTable.InvokeRequired)
             {
@@ -150,21 +152,21 @@ namespace EquipManager
             else
             {
                 gridTable.DataSource = dt;
-                tModel.Text = dt.Rows[0][1].ToString();
-                tLine.Text = dt.Rows[0][2].ToString();
-                tBatt.Text = dt.Rows[0][3].ToString();
-                tState.Text = dt.Rows[0][4].ToString();
-                tCount.Text = dt.Rows[0][5].ToString();
-                tTemp.Text = dt.Rows[0][6].ToString();
-                tHumi.Text = dt.Rows[0][7].ToString();
-                tWind.Text = dt.Rows[0][8].ToString();
-                tOzone.Text = dt.Rows[0][9].ToString();
-                tAtmos.Text = dt.Rows[0][10].ToString();
+                tModel.Text = dt.Rows[idx][1].ToString();
+                tLine.Text = dt.Rows[idx][2].ToString();
+                tBatt.Text = dt.Rows[idx][3].ToString();
+                tState.Text = dt.Rows[idx][4].ToString();
+                tCount.Text = dt.Rows[idx][5].ToString();
+                tTemp.Text = dt.Rows[idx][6].ToString();
+                tHumi.Text = dt.Rows[idx][7].ToString();
+                tWind.Text = dt.Rows[idx][8].ToString();
+                tOzone.Text = dt.Rows[idx][9].ToString();
+                tAtmos.Text = dt.Rows[idx][10].ToString();
             }
         }
         object RunSql(string sql) // op= 0 -> return nothing, op=1 -> return object
         {
-            sqlcomd.CommandText=sql;
+            sqlcomd.CommandText = sql;
             if (jslib.GetToken(0, sql.Trim(), ' ').ToUpper() == "SELECT")
             {
                 SqlDataReader sr = sqlcomd.ExecuteReader();
@@ -219,15 +221,30 @@ namespace EquipManager
             SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM EqStatus", sqlconn);
             DataTable ds = new DataTable();
             adapter.Fill(ds);
-            GridView(ds);
+            GridView(ds, 0);
             int cnum = ds.Rows.Count;
             Control[] BTN = new Control[cnum];
             for (int i = 0; i < cnum; i++)
             {
                 BTN[i] = new Button();
-                BTN[i].Text = $"Code : {i+1}";
-                // BTM[i].Click+=Select_Code;
+                BTN[i].Text = $"Code : {i + 1}";
+                BTN[i].Click += Select_Code;
                 flpanel.Controls.Add(BTN[i]);
+            }
+
+        }
+       
+        public void Select_Code(object sender, EventArgs e) // "동"
+        {
+            index = int.Parse(((Button)sender).Text.Split(':')[1]);
+            clear_btn();
+            ((Button)sender).BackColor = Color.Gray;
+        }
+        private void clear_btn()   // "품목"
+        {
+            for (int i = 0; i < item_list.Count; i++)
+            {
+                BTN[i].BackColor = Button.DefaultBackColor;
             }
         }
 
