@@ -11,6 +11,7 @@ Emulator Program using C#
 - File > End : Server 종료.
 - File > Exit Program : 프로그램 종료
 - EquipDB.mdf : 수신한 값을 저장해둔 Local Database 파일 
+- 실시간 Database 갱신 및 장비 Code별 조회 기능 추가.
 #### Virtual Equipment(Right)
 - File > Start : Server와 연결 시도. 시간 간격 마다 데이터(기기 정보 및 센서 값) 전송.
 - File > End : Server와 연결 해제
